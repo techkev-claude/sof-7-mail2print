@@ -1,0 +1,24 @@
+services:
+  mail2print:
+    build: ./app
+    container_name: mail2print
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:8000"
+    volumes:
+      - "${DATA_PATH}:/app/data"
+      - cups_data:/var/spool/cups
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os; os.path.exists('/app/data/healthcheck')"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    environment:
+      - TZ=${TZ}
+
+volumes:
+  cups_data:
+    driver: local
